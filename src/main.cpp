@@ -1,4 +1,5 @@
 #include "main.h"
+#include "brainui.hpp"
 #include "pros/misc.h"
 
 /////
@@ -11,7 +12,7 @@ ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
     {-2,-11,7},     // Left Chassis Ports (negative port will reverse it!
     {12,18,-14},  // Right Chassis Ports (negative port will reverse it!)
-  
+
     6,      // IMU Port
     3.25,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
     360);   // Wheel RPMz
@@ -25,8 +26,9 @@ ez::Drive chassis(
 void initialize() {
   // Print our branding over your terminal :D
   ez::ez_template_print();
-
   pros::delay(500);  // Stop the user from doing anything while legacy ports configure
+  pros::screen::set_pen(0x15171a);
+  pros::screen::fill_rect(0, 0, 480, 240);
 
   // Configure your chassis controls
   chassis.opcontrol_curve_buttons_toggle(true);  // Enables modifying the controller curve with buttons on the joysticks
@@ -40,15 +42,31 @@ void initialize() {
   // chassis.opcontrol_curve_buttons_left_set(pros::E_CONTROLLER_DIGITAL_LEFT, pros::E_CONTROLLER_DIGITAL_RIGHT);  // If using tank, only the left side is used.
   // chassis.opcontrol_curve_buttons_right_set(pros::E_CONTROLLER_DIGITAL_Y, pros::E_CONTROLLER_DIGITAL_A);
 
-  // Autonomous Selector using LLEMU
-  ez::as::auton_selector.autons_add({
-      Auton("score ring", giliscool)
-   });
+  // Autonomous Selector using lvgl
+  j_auton_selector.jautonpopulate({
+      jas::jasauton("giliscool", "score ring", giliscool),
+  });
+
+  j_auton_selector.bluepos.startValue = 0; //starting value in the vector for the blue positive autons
+  j_auton_selector.bluepos.range = 0; //one less than the range in the vector for the blue positive autons (i.e if the value is 1, there are 2 autons)
+  j_auton_selector.redpos.startValue = 0; //starting value in the vector for the red positive autons
+  j_auton_selector.redpos.range = 0; //one less than the range in the vector for the red positive autons
+  j_auton_selector.blueneg.startValue = 0; //starting value in the vector for the blue negative autons
+  j_auton_selector.blueneg.range = 0; //one less than the range in the vector for the blue negative autons
+  j_auton_selector.redneg.startValue = 0; //starting value in the vector for the red negative autons
+  j_auton_selector.redneg.range = 0; //one less than the range in the vector for the red negative autons
 
   // Initialize chassis and auton selector
   chassis.initialize();
-  ez::as::initialize();
+  screeninit();
   master.rumble(".");
+}
+
+void autonUiElements() {
+  //sets the ui elements displayed for any given auton
+  if(strcmp((j_auton_selector.jasautontable[j_auton_selector.autontable].Name).c_str() , "giliscool") == 0) {
+    uivalues.autondisplayset(2, 0, uivalues.red, uivalues.neutral, uivalues.neutral);
+  }
 }
 
 /**
@@ -89,8 +107,9 @@ void autonomous() {
   chassis.drive_imu_reset();                  // Reset gyro position to 0
   chassis.drive_sensor_reset();               // Reset drive sensors to 0
   chassis.drive_brake_set(MOTOR_BRAKE_HOLD);  // Set motors to hold.  This helps autonomous consistency
-
-  ez::as::auton_selector.selected_auton_call();  // Calls selected auton from autonomous selector
+  if(noselection == false) {
+  j_auton_selector.jautonRun();
+  }
 }
 
 /**
