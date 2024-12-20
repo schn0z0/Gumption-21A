@@ -192,31 +192,36 @@ void interfered_example() {
 // . . .
 // Make your own autonomous functions here!
 // . . .
- void giliscool(){
-chassis.pid_wait();
-chassis.pid_drive_set(10_in, 30, true); //drive forward
+
+  void rightside(){
+mogoMech.set(true);
 chassis.pid_wait_quick_chain();
-chassis.pid_turn_set(-35_deg, TURN_SPEED); //turn towards mogo
+chassis.pid_drive_set(-24_in, 50, true);
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(15_in, 80, true); //drive to mogo
+mogoMech.set(false);
 chassis.pid_wait_quick_chain();
-mogoMech.set(true); //pick up mogo
+chassis.pid_turn_set(-90_deg, TURN_SPEED);
 chassis.pid_wait_quick_chain();
-intake.move(127); //score prematch load
+intake.move(127);
 chassis.pid_wait_quick_chain();
-/*chassis.pid_drive_set(6_in, 80, true); 
+chassis.pid_drive_set(28_in, 70, true);
 chassis.pid_wait_quick_chain();
-intake.move(-45); //reverse intake for occasionally stuck ring*/
-chassis.pid_turn_set(-85_deg, TURN_SPEED); //turn towards 2nd ring
+chassis.pid_drive_set(-48_in, 70, true);
 chassis.pid_wait_quick_chain();
-intake.move(127); //turn on intake for 2nd ring
-chassis.pid_drive_set(-27_in, 80); //drive towards second ring
+}
+  void leftside(){
+mogoMech.set(true);
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(31_in, 80); //drive to ladder
+chassis.pid_drive_set(-24_in, 50, true);
 chassis.pid_wait_quick_chain();
-chassis.pid_turn_set(-45_deg, TURN_SPEED); //turn towards ladder
+mogoMech.set(false);
+chassis.pid_wait_quick_chain();   
+chassis.pid_turn_set(90_deg, TURN_SPEED);
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(11_in, 80); //drive to ladder
+intake.move(127);
 chassis.pid_wait_quick_chain();
-intake.move(0);//turn off intake
- }  
+chassis.pid_drive_set(28_in, 70, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-48_in, 70, true);
+chassis.pid_wait_quick_chain();
+}

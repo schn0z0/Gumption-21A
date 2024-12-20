@@ -1,7 +1,15 @@
 #include "main.h"
+#include <sys/_intsup.h>
+#include <cstdio>
 #include "brainui.hpp"
 #include "pros/misc.h"
+#include "pros/motors.h"
+#include "pros/rtos.hpp"
+#include "subsystems.hpp"
+using pros::E_MOTOR_BRAKE_BRAKE;
 
+bool LBprimed = false;
+int LBpos = 0;
 /////
 // For installation, upgrading, documentations, and tutorials, check out our website!
 // https://ez-robotics.github.io/EZ-Template/
@@ -10,8 +18,8 @@
 // Chassis constructor
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
-    {-2,-11,7},     // Left Chassis Ports (negative port will reverse it!
-    {12,18,-14},  // Right Chassis Ports (negative port will reverse it!)
+    {-3,4,-11},     // Left Chassis Ports (negative port will reverse it!
+    {1,12,-2},  // Right Chassis Ports (negative port will reverse it!)
 
     6,      // IMU Port
     3.25,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
@@ -44,17 +52,18 @@ void initialize() {
 
   // Autonomous Selector using lvgl
   j_auton_selector.jautonpopulate({
-      jas::jasauton("giliscool", "score ring", giliscool),
-  });
+      jas::jasauton("rightside", "score ring", rightside),
+      jas::jasauton("leftside", "score ring", leftside),
+  }); 
 
   j_auton_selector.bluepos.startValue = 0; //starting value in the vector for the blue positive autons
-  j_auton_selector.bluepos.range = 0; //one less than the range in the vector for the blue positive autons (i.e if the value is 1, there are 2 autons)
+  j_auton_selector.bluepos.range = 2; //one less than the range in the vector for the blue positive autons (i.e if the value is 1, there are 2 autons)
   j_auton_selector.redpos.startValue = 0; //starting value in the vector for the red positive autons
-  j_auton_selector.redpos.range = 0; //one less than the range in the vector for the red positive autons
+  j_auton_selector.redpos.range = 2; //one less than the range in the vector for the red positive autons
   j_auton_selector.blueneg.startValue = 0; //starting value in the vector for the blue negative autons
-  j_auton_selector.blueneg.range = 0; //one less than the range in the vector for the blue negative autons
+  j_auton_selector.blueneg.range = 2; //one less than the range in the vector for the blue negative autons
   j_auton_selector.redneg.startValue = 0; //starting value in the vector for the red negative autons
-  j_auton_selector.redneg.range = 0; //one less than the range in the vector for the red negative autons
+  j_auton_selector.redneg.range = 2; //one less than the range in the vector for the red negative autons
 
   // Initialize chassis and auton selector
   chassis.initialize();
@@ -64,7 +73,10 @@ void initialize() {
 
 void autonUiElements() {
   //sets the ui elements displayed for any given auton
-  if(strcmp((j_auton_selector.jasautontable[j_auton_selector.autontable].Name).c_str() , "giliscool") == 0) {
+   if(strcmp((j_auton_selector.jasautontable[j_auton_selector.autontable].Name).c_str() , "rightside") == 0) {
+    uivalues.autondisplayset(2, 0, uivalues.red, uivalues.neutral, uivalues.neutral);
+  }
+   if(strcmp((j_auton_selector.jasautontable[j_auton_selector.autontable].Name).c_str() , "leftside") == 0) {
     uivalues.autondisplayset(2, 0, uivalues.red, uivalues.neutral, uivalues.neutral);
   }
 }
@@ -129,9 +141,9 @@ void autonomous() {
 void opcontrol() {
   // This is preference to what you like to drive on
   pros::motor_brake_mode_e_t driver_preference_brake = pros::E_MOTOR_BRAKE_BRAKE;
-
+ ladyBrown.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  
   chassis.drive_brake_set(driver_preference_brake);
-
   while (true) {
     // PID Tuner
     // After you find values that you're happy with, you'll have to set them in auton.cpp
@@ -156,6 +168,38 @@ void opcontrol() {
     // . . .
     // Put more user control code here!
     // . . .
+
+/*if(master.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
+  LBprimed == false ? LBprimed = true : LBprimed = false;
+  pros::delay(1000);
+}
+if(ladyBrownPos.get_angle() < 300 && LBprimed == true) {
+  ladyBrown.move(127);
+  pros::delay(10);
+}
+else if (ladyBrownPos.get_angle() > 10 && LBprimed == false) {
+  ladyBrown.move(-127);
+  pros::delay(10);
+}
+else ladyBrown.move(0);*/
+  if (master.get_digital(pros::E_CONTROLLER_DIGITAL_Y)){
+    if (LBsens.get_angle()>30000){                                 // down
+      ladyBrown.move_absolute(-280, 200);      // primed
+    } else {
+      ladyBrown.move_absolute(-25, 200);       // down
+    }
+  }
+  if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
+    if ((LBsens.get_angle()<2000) or (LBsens.get_angle()>30000)){  // primed or down
+      ladyBrown.move_absolute(-1400, 200);    // score
+    } else {  
+      ladyBrown.move_absolute(-25, 200);      // down
+    }
+  }
+
+
+
+
   if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
     intake.move(-127);
   } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
@@ -163,7 +207,7 @@ void opcontrol() {
   } else {
     intake.move(0);
 }
-  mogoMech.button_toggle(master.get_digital(pros::E_CONTROLLER_DIGITAL_R1));
+  mogoMech.button_toggle(master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN));
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }
  

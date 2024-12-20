@@ -14,4 +14,5 @@ void combining_movements();
 void interfered_example();
 
 void default_constants();
-void giliscool();
+void rightside();
+void leftside();
