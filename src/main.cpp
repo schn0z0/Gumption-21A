@@ -1,12 +1,5 @@
 #include "main.h"
-#include <sys/_intsup.h>
-#include <cstdio>
-#include "brainui.hpp"
-#include "pros/misc.h"
-#include "pros/motors.h"
-#include "pros/rtos.hpp"
 #include "subsystems.hpp"
-using pros::E_MOTOR_BRAKE_BRAKE;
 
 bool LBprimed = false;
 int LBpos = 0;
@@ -24,6 +17,19 @@ ez::Drive chassis(
     4,      // IMU Port
     3.25,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
     360);   // Wheel RPMz
+
+// list of motors to get temperature
+pros::Motor intake1(20);
+pros::Motor intake2(19);
+pros::Motor driveleft1(-9);
+pros::Motor driveleft2(10);
+pros::Motor driveleft3(-8);
+pros::Motor driveright1(-1);
+pros::Motor driveright2(2);
+pros::Motor driveright3(3);
+
+vector<jas::motors::motordata> motorbar{{intake1, "intake 1"}, {driveleft1, "drive l1"},  {driveleft2, "drive l2"},	 {driveleft3, "drive l3"},
+										{intake2, "intake 2"}, {driveright1, "drive r1"}, {driveright2, "drive r2"}, {driveright3, "drive r3"}, {ladyBrown, "lady brown"}};
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -51,34 +57,19 @@ void initialize() {
   // chassis.opcontrol_curve_buttons_right_set(pros::E_CONTROLLER_DIGITAL_Y, pros::E_CONTROLLER_DIGITAL_A);
 
   // Autonomous Selector using lvgl
-  j_auton_selector.jautonpopulate({
-      jas::jasauton("rightside", "score ring", rightside),
-      jas::jasauton("leftside", "score ring", leftside),
-  }); 
+  j_auton_selector.jautonpopulate(
+		{jas::jasauton(leftside, 2, 2, "Left side auton", "Auton built for the left side of the field, no matter the alliance", 2, 0, false),
+		 jas::jasauton(rightside, 2, 2, "Right side auton", "Auton built for the right side of the field, no matter the alliance", 0, 2, false)
+		 });
 
-  j_auton_selector.bluepos.startValue = 0; //starting value in the vector for the blue positive autons
-  j_auton_selector.bluepos.range = 2; //one less than the range in the vector for the blue positive autons (i.e if the value is 1, there are 2 autons)
-  j_auton_selector.redpos.startValue = 0; //starting value in the vector for the red positive autons
-  j_auton_selector.redpos.range = 2; //one less than the range in the vector for the red positive autons
-  j_auton_selector.blueneg.startValue = 0; //starting value in the vector for the blue negative autons
-  j_auton_selector.blueneg.range = 2; //one less than the range in the vector for the blue negative autons
-  j_auton_selector.redneg.startValue = 0; //starting value in the vector for the red negative autons
-  j_auton_selector.redneg.range = 2; //one less than the range in the vector for the red negative autons
 
   // Initialize chassis and auton selector
   chassis.initialize();
-  screeninit();
-  master.rumble(".");
-}
-
-void autonUiElements() {
-  //sets the ui elements displayed for any given auton
-   if(strcmp((j_auton_selector.jasautontable[j_auton_selector.autontable].Name).c_str() , "rightside") == 0) {
-    uivalues.autondisplayset(2, 0, uivalues.red, uivalues.neutral, uivalues.neutral);
-  }
-   if(strcmp((j_auton_selector.jasautontable[j_auton_selector.autontable].Name).c_str() , "leftside") == 0) {
-    uivalues.autondisplayset(2, 0, uivalues.red, uivalues.neutral, uivalues.neutral);
-  }
+	_init_fs();
+	screeninit();
+	master.rumble(".");
+	pros::Task tempcheckcontroller(tempcheckctrl);
+	pros::Task colordetection(colorDetect);
 }
 
 /**
@@ -118,10 +109,19 @@ void autonomous() {
   chassis.pid_targets_reset();                // Resets PID targets to 0
   chassis.drive_imu_reset();                  // Reset gyro position to 0
   chassis.drive_sensor_reset();               // Reset drive sensors to 0
+  chassis.odom_xyt_set(0_in, 0_in, 0_deg);	// Set the current position, you can start at a specific position with this
   chassis.drive_brake_set(MOTOR_BRAKE_HOLD);  // Set motors to hold.  This helps autonomous consistency
-  if(noselection == false) {
-  j_auton_selector.jautonRun();
-  }
+  
+  if(lv_tileview_get_tile_act(mainscreen) == autobuilder)
+		autocallback();
+  else if(lv_tileview_get_tile_act(mainscreen) == manbuilder)
+		mancallback();
+  else {
+		if(noselection == false) {
+			printf("Running auton");
+			jautonrun();
+		}
+	}
 }
 
 /**
@@ -141,7 +141,9 @@ void autonomous() {
 void opcontrol() {
   // This is preference to what you like to drive on
   pros::motor_brake_mode_e_t driver_preference_brake = pros::E_MOTOR_BRAKE_BRAKE;
- ladyBrown.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  scrpage = 2;
+	lv_event_send(pageswitch, LV_EVENT_CLICKED, NULL);
+  ladyBrown.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   
   chassis.drive_brake_set(driver_preference_brake);
   while (true) {
@@ -168,6 +170,12 @@ void opcontrol() {
     // . . .
     // Put more user control code here!
     // . . .
+
+    if(lv_tileview_get_tile_act(mainscreen) == motortemps) {
+			for(int m = 0; m < motorbar.size(); m++) {
+				lv_event_send(motorboxes[m], LV_EVENT_REFRESH, NULL);
+			}
+		}
 
 /*if(master.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
   LBprimed == false ? LBprimed = true : LBprimed = false;
