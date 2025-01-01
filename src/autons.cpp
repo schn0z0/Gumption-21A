@@ -194,11 +194,11 @@ void interfered_example() {
 // . . .
 
   void rightside(){
-mogoMech.set(true);
+mogoMech.set(false);
 chassis.pid_wait_quick_chain();
 chassis.pid_drive_set(-24_in, 50, true);
 chassis.pid_wait_quick_chain();
-mogoMech.set(false);
+mogoMech.set(true);
 chassis.pid_wait_quick_chain();
 chassis.pid_turn_set(-90_deg, TURN_SPEED);
 chassis.pid_wait_quick_chain();
@@ -206,15 +206,15 @@ intake.move(127);
 chassis.pid_wait_quick_chain();
 chassis.pid_drive_set(28_in, 70, true);
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(-48_in, 70, true);
+chassis.pid_drive_set(-40_in, 70, true);
 chassis.pid_wait_quick_chain();
 }
   void leftside(){
-mogoMech.set(true);
+mogoMech.set(false);
 chassis.pid_wait_quick_chain();
 chassis.pid_drive_set(-24_in, 50, true);
 chassis.pid_wait_quick_chain();
-mogoMech.set(false);
+mogoMech.set(true);
 chassis.pid_wait_quick_chain();   
 chassis.pid_turn_set(90_deg, TURN_SPEED);
 chassis.pid_wait_quick_chain();
@@ -222,6 +222,6 @@ intake.move(127);
 chassis.pid_wait_quick_chain();
 chassis.pid_drive_set(28_in, 70, true);
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(-48_in, 70, true);
+chassis.pid_drive_set(-40_in, 70, true);
 chassis.pid_wait_quick_chain();
 }
