@@ -1,4 +1,5 @@
 #include "main.h"
+#include "pros/misc.h"
 #include "subsystems.hpp"
 
 bool LBprimed = false;
@@ -11,25 +12,27 @@ int LBpos = 0;
 // Chassis constructor
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
-    {-9,10,-8},     // Left Chassis Ports (negative port will reverse it!
-    {-1,2,3},  // Right Chassis Ports (negative port will reverse it!)
+    {-18,15,-19},     // Left Chassis Ports (negative port will reverse it!
+    {-17,12,16},  // Right Chassis Ports (negative port will reverse it!)
 
-    4,      // IMU Port
+    10,      // IMU Port
     3.25,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
     360);   // Wheel RPMz
 
+ez::tracking_wheel vertical_tracker(1,2.03856,0);
+
 // list of motors to get temperature
-pros::Motor intake1(20);
-pros::Motor intake2(19);
-pros::Motor driveleft1(-9);
-pros::Motor driveleft2(10);
-pros::Motor driveleft3(-8);
-pros::Motor driveright1(-1);
-pros::Motor driveright2(2);
-pros::Motor driveright3(3);
+pros::Motor intake1(1);
+pros::Motor intake2(-8);
+pros::Motor driveleft1(-18);
+pros::Motor driveleft2(15);
+pros::Motor driveleft3(-19);
+pros::Motor driveright1(-17);
+pros::Motor driveright2(12);
+pros::Motor driveright3(16);
 
 vector<jas::motors::motordata> motorbar{{intake1, "intake 1"}, {driveleft1, "drive l1"},  {driveleft2, "drive l2"},	 {driveleft3, "drive l3"},
-										{intake2, "intake 2"}, {driveright1, "drive r1"}, {driveright2, "drive r2"}, {driveright3, "drive r3"}, {ladyBrown, "lady brown"}};
+										{intake2, "intake 2"}, {driveright1, "drive r1"}, {driveright2, "drive r2"}, {driveright3, "drive r3"}, {ladybrown, "lady brown"}};
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -58,9 +61,22 @@ void initialize() {
 
   // Autonomous Selector using lvgl
   j_auton_selector.jautonpopulate(
-		{jas::jasauton(leftside, 2, 2, "Left side auton", "Auton built for the left side of the field, no matter the alliance", 2, 0, false),
-		 jas::jasauton(rightside, 2, 2, "Right side auton", "Auton built for the right side of the field, no matter the alliance", 0, 2, false)
-		 });
+    
+		{    jas::jasauton(rightAWP, 2, 2, "Right side AWP", "RIGHT SIDE AWP", 0, 3, true),
+		jas::jasauton(leftAWP, 2, 2, "left side AWP", "LEFT SIDE AWP", 3, 0, true),
+    jas::jasauton(leftside, 2, 2, "Left side auton", "LEFT LEFT LEFT LEFT LEFT LEFT LEFT", 2, 0, false),
+		jas::jasauton(rightside, 2, 2, "Right side auton", "RIGHT RIGHT RIGHT RIGHT RIGHT RIGHT RIGHT", 0, 2, false),
+		jas::jasauton(skills, 2, 2, "skills", "SKILLS SKILLS SKILLS SKILLS SKILLS", 5, 5, false),
+    jas::jasauton(newauton, 1, 1, "Blank auton 1", "color sort test red", 0, 0, false),
+		jas::jasauton(newauton2, 0, 0, "Blank auton 2", "color sort test blue", 0, 0, false),
+
+    jas::jasauton(testautonRed, 0, 0, "Red Color sort test", "color sort test blue", 0, 0, false)
+    
+    
+    
+    
+    
+     });
 
 
   // Initialize chassis and auton selector
@@ -70,6 +86,7 @@ void initialize() {
 	master.rumble(".");
 	pros::Task tempcheckcontroller(tempcheckctrl);
 	pros::Task colordetection(colorDetect);
+  pros::Task ringsensetask(ringsensTask);
 }
 
 /**
@@ -137,13 +154,18 @@ void autonomous() {
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
+bool setLB = true;
+bool was_preset_pressed = false;
+double target = 0.0;
+
 
 void opcontrol() {
+  is_color_sorting = false;
   // This is preference to what you like to drive on
   pros::motor_brake_mode_e_t driver_preference_brake = pros::E_MOTOR_BRAKE_BRAKE;
   scrpage = 2;
 	lv_event_send(pageswitch, LV_EVENT_CLICKED, NULL);
-  ladyBrown.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+//  ladyBrown.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   
   chassis.drive_brake_set(driver_preference_brake);
   while (true) {
@@ -177,33 +199,33 @@ void opcontrol() {
 			}
 		}
 
-/*if(master.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
-  LBprimed == false ? LBprimed = true : LBprimed = false;
-  pros::delay(1000);
-}
-if(ladyBrownPos.get_angle() < 300 && LBprimed == true) {
-  ladyBrown.move(127);
-  pros::delay(10);
-}
-else if (ladyBrownPos.get_angle() > 10 && LBprimed == false) {
-  ladyBrown.move(-127);
-  pros::delay(10);
-}
-else ladyBrown.move(0);*/
-  if (master.get_digital(pros::E_CONTROLLER_DIGITAL_Y)){
-    if (LBsens.get_angle()>30000){                                 // down
-      ladyBrown.move_absolute(-280, 200);      // primed
-    } else {
-      ladyBrown.move_absolute(-25, 200);       // down
-    }
-  }
-  if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
-    if ((LBsens.get_angle()<2000) or (LBsens.get_angle()>30000)){  // primed or down
-      ladyBrown.move_absolute(-1400, 200);    // score
-    } else {  
-      ladyBrown.move_absolute(-25, 200);      // down
-    }
-  }
+
+
+
+	if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
+		was_preset_pressed = true;
+		setLB = !setLB;
+		if(ladybrown.get_position() > 280) setLB = false;
+		if(setLB) {
+			ladybrown.move_absolute(10, 100);
+		} else {
+			ladybrown.move_absolute(190, 100);
+		}
+	} else {
+		if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+			ladybrown.move(90);
+			target = ladybrown.get_position();
+			was_preset_pressed = false;
+		} else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+			ladybrown.move(-90);
+			target = ladybrown.get_position();
+			was_preset_pressed = false;
+		} else {
+			if(!was_preset_pressed) {
+				ladybrown.move_absolute(target, 20);  // this isn't going full power because it was yucky going full power
+			}
+		}
+	}
 
 
 
@@ -215,7 +237,8 @@ else ladyBrown.move(0);*/
   } else {
     intake.move(0);
 }
-  mogoMech.button_toggle(master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN));
+  mogoMech.button_toggle(master.get_digital(pros::E_CONTROLLER_DIGITAL_Y));
+  doinker.button_toggle(master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT));
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }
  

@@ -1,7 +1,7 @@
 #include "main.h"  // IWYU pragma: keep
 
 void testautonbuilder() {
-	pros::Task ringsort(ringsensTask, (void*)"0");
+	// pros::Task ringsort(ringsensTask, (void*)"0");
 	chassis.odom_pose_set({48_in, 21_in, 180_deg});
 	left_mogo();
 	left_btm_ring();
@@ -60,7 +60,7 @@ void left_mogo() {
 		chassis.pid_odom_set({{72_in, 24_in}, fwd, 127});
 		chassis.pid_wait_quick_chain();
 	}
-	chassis.pid_odom_set({{48_in, 48_in}, rev, 90});
+	chassis.pid_odom_set({{48_in, 48_in}, rev, 30});
 	chassis.pid_wait();
 	mogoMech.set(true);
 	chassis.pid_wait();
@@ -71,7 +71,7 @@ void right_mogo() {
 		chassis.pid_odom_set({{72_in, 24_in}, fwd, 127});
 		chassis.pid_wait_quick_chain();
 	}
-	chassis.pid_odom_set({{96_in, 48_in}, rev, 90});
+	chassis.pid_odom_set({{96_in, 48_in}, rev, 30});
 	chassis.pid_wait();
 	mogoMech.set(true);
 	chassis.pid_wait();
