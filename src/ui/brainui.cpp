@@ -47,8 +47,6 @@ static lv_style_t styleswitch;
 lv_obj_t *mainscreen = lv_tileview_create(NULL);
 lv_obj_t *autoselector = lv_tileview_add_tile(mainscreen, 0, 0, LV_DIR_NONE);
 lv_obj_t *motortemps = lv_tileview_add_tile(mainscreen, 1, 0, LV_DIR_NONE);
-lv_obj_t *autobuilder = lv_tileview_add_tile(mainscreen, 2, 0, LV_DIR_NONE);
-lv_obj_t *manbuilder = lv_tileview_add_tile(mainscreen, 2, 1, LV_DIR_NONE);
 lv_obj_t *overlay = lv_img_create(autoselector);
 lv_obj_t *autonselectup = lv_btn_create(autoselector);
 lv_obj_t *autonselectdown = lv_btn_create(autoselector);
@@ -148,7 +146,7 @@ static void updownbtn(lv_event_t *e) {
 	listupdate();
 }
 
-lv_obj_t *screens[3]{autoselector, motortemps, autobuilder};
+lv_obj_t *screens[2]{autoselector, motortemps};
 
 static void pageswitchbtn(lv_event_t *e) {
 	const bool *getside = (bool *)lv_event_get_user_data(e);
@@ -290,11 +288,9 @@ void screeninit() {
 	lv_event_send(redblu, LV_EVENT_CLICKED, NULL);
 
 	tempcheck();
-	autonbuilderinit();
-	manualbuilderinit();
 
 	for(int i = 0; i < 4; i++) {
-		pageswitch = lv_img_create(screens[i % 3]);
+		pageswitch = lv_img_create(screens[i % 2]);
 		lv_img_set_src(pageswitch, i < 3 ? LV_SYMBOL_RIGHT : LV_SYMBOL_LEFT);
 		lv_obj_set_size(pageswitch, 18, 18);
 		lv_obj_set_pos(pageswitch, i < 3 ? 456 : 6, 6);
