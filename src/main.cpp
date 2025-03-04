@@ -160,7 +160,6 @@ void opcontrol() {
   is_color_sorting = false;
   // This is preference to what you like to drive on
   pros::motor_brake_mode_e_t driver_preference_brake = pros::E_MOTOR_BRAKE_BRAKE;
-  scrpage = 2;
 	lv_event_send(pageswitch, LV_EVENT_CLICKED, NULL);
 //  ladyBrown.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   

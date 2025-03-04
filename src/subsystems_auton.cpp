@@ -51,8 +51,8 @@ void discard() {
 }
 
 void unjamTask() {
+  int jamtime = 0;
   while (true) {
-    int jamtime = 0;
     if (!jammed && target != 0 && abs(hook.get_actual_velocity()) <= 20) {
       jamtime++;
       if (jamtime > 20) {

@@ -6,7 +6,7 @@ int j = 0;
 int selected = 0;
 int redblustore = 0;
 int posnegstore = 0;
-int scrpage = 0;
+bool scrpage = false;
 vector<jasauton> jautoncurated = {};
 bool noselection;
 bool pageside[2]{true, false};
@@ -149,10 +149,9 @@ static void updownbtn(lv_event_t *e) {
 lv_obj_t *screens[2]{autoselector, motortemps};
 
 static void pageswitchbtn(lv_event_t *e) {
-	const bool *getside = (bool *)lv_event_get_user_data(e);
-	scrpage = *getside ? (scrpage + 1) % 3 : scrpage == 0 ? 2 : (scrpage - 1) % 3;
-	lv_obj_set_tile(mainscreen, screens[scrpage], LV_ANIM_ON);
-	lv_obj_set_parent(pageswitch, screens[scrpage]);
+	scrpage = !scrpage;
+	lv_obj_set_tile(mainscreen, screens[(int)scrpage], LV_ANIM_ON);
+	lv_obj_set_parent(pageswitch, screens[(int)scrpage]);
 }
 
 lv_event_cb_t jautonCurate = jautoncurate;
