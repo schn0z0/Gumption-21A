@@ -46,12 +46,9 @@
 // More includes here...
 #include "autons.hpp"
 #include "subsystems.hpp"
-#include "ui/autonbuilderui.hpp"
 #include "ui/brainui.hpp"
 #include "ui/filesystem.h"
-#include "ui/manualbuilderui.hpp"
 #include "ui/motortempsui.hpp"
-#include "autonbuilder.hpp"
 #include "subsystems_auton.hpp"
 
 

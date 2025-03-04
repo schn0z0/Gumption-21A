@@ -1,5 +1,7 @@
 #include "autons.hpp"
 #include "main.h"
+#include "pros/rtos.hpp"
+#include "subsystems.hpp"
 #include "subsystems_auton.hpp"
 
 /////
@@ -194,37 +196,69 @@ void interfered_example() {
 // . . .
 // Make your own autonomous functions here!
 // . . .
-void rightAWP(){
-  is_red = true; //is_red means it will sort OUT red, not that you are on red team
+void RED_rightAWP(){
+  is_red = false; //is_red means it will sort OUT red, not that you are on red team
   is_color_sorting = true;
 intake.move(-80); //intake moves backwards to push rings out of the way better
-chassis.pid_drive_set(8_in, 35, true); //
+chassis.pid_drive_set(7_in, 55, true); //
 chassis.pid_wait_quick_chain();
-chassis.pid_turn_set(-90_deg, TURN_SPEED); //turn towards alliance stake
+chassis.pid_turn_set(-90_deg, 50); //turn towards alliance stake
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(6_in, 35, true); //drive to alliance stake
+chassis.pid_drive_set(6.5_in, 45, true); //drive to alliance stake
 intake.move(0); 
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(-5_in, 45, true); //drive away from alliance stake
+chassis.pid_drive_set(-3_in, 55, true); //drive away from alliance stake
 chassis.pid_wait_quick_chain();
-chassis.pid_turn_set(-50_deg, TURN_SPEED); //turn to mogo
+chassis.pid_turn_set(-53_deg, TURN_SPEED); //turn to mogo
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(-34_in, 80, true); //drive to mogo
-chassis.pid_wait_until(-29); //this line makes the bot clamp once it gets to the mogo, and then keep going to the desired target
+chassis.pid_drive_set(-36_in, 85, true); //drive to mogo
+chassis.pid_wait_until(-32); //this line makes the bot clamp once it gets to the mogo, and then keep going to the desired target
 mogoMech.set(true);
 chassis.pid_wait_quick_chain();
-chassis.pid_turn_set(180_deg, TURN_SPEED); //turn to safe ring stack
+chassis.pid_turn_relative_set(-127_deg, TURN_SPEED); //turn to safe ring stack
 chassis.pid_wait_quick_chain();
-intake.move(100); //run intake to pick up rings for the rest of auton
-chassis.pid_drive_set(22_in, 80, true); //drive to safe ring stack
+intake.move(127); //run intake to pick up rings for the rest of auton
+chassis.pid_drive_set(18_in, 75, true); //drive to safe ring stack
 chassis.pid_wait_quick_chain();
-chassis.pid_turn_set(240_deg, TURN_SPEED); //turn to corner
+chassis.pid_turn_relative_set(66_deg, TURN_SPEED); //turn to corner
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(45_in, 60, true); //the rest of the code just makes it ram into the corner 3 times to hopefully pick up all the rings
+chassis.pid_drive_set(25_in, 85, true);
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(-12_in, 60, true);
+chassis.pid_drive_set(17_in, 65, true); //the rest of the code just makes it ram into the corner 3 times to hopefully pick up all the rings
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-10_in, 55, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 85, true);
+//hook.move(120);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-10_in, 55, true);
 //hook.move(-25);
 chassis.pid_wait_quick_chain();
+//chassis.pid_turn_relative_set(6_deg, TURN_SPEED);
+//chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 85, true);
+//hook.move(120);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-10_in, 60, true);
+//hook.move(-25);
+chassis.pid_wait_quick_chain();
+//chassis.pid_turn_relative_set(-6_deg, TURN_SPEED);
+//chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 60, true);
+//hook.move(120);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-10_in, 60, true);
+//hook.move(-25);
+chassis.pid_wait_quick_chain();
+//chassis.pid_turn_relative_set(6_deg, TURN_SPEED);
+//chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(11_in, 60, true);
+//hook.move(120);
+chassis.pid_turn_relative_set(-20_deg, TURN_SPEED);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-52_in, 100, true);
+//hook.move(-25);
+/*chassis.pid_wait_quick_chain();
 chassis.pid_drive_set(14_in, 60, true);
 //hook.move(120);
 chassis.pid_wait_quick_chain();
@@ -232,76 +266,332 @@ chassis.pid_drive_set(-12_in, 60, true);
 //hook.move(-25);
 chassis.pid_wait_quick_chain();
 chassis.pid_drive_set(14_in, 60, true);
-//hook.move(120);
-chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(-12_in, 60, true);
-//hook.move(-25);
-chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(14_in, 60, true);
-//hook.move(120);
-chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(-12_in, 60, true);
-//hook.move(-25);
-chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(14_in, 60, true);
-//hook.move(120);
-chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(-12_in, 60, true);
-//hook.move(-25);
-chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(14_in, 60, true);
-//hook.move(120);
-chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(-12_in, 60, true);
-//hook.move(-25);
-chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(14_in, 60, true);
-//hook.move(120);
+//hook.move(120); */
 }
 
-void leftAWP(){
-//Make what I did on the right side work on the left side here :3
+void RED_leftAWP(){
+  is_red = false; //is_red means it will sort OUT red, not that you are on red team
+  is_color_sorting = true;
+intake.move(-80); //intake moves backwards to push rings out of the way better
+chassis.pid_drive_set(7_in, 55, true); //
+chassis.pid_wait_quick_chain();
+chassis.pid_turn_set(90_deg, 50); //turn towards alliance stake
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(7_in, 45, true); //drive to alliance stake
+intake.move(0); 
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-3_in, 55, true); //drive away from alliance stake
+chassis.pid_wait_quick_chain();
+chassis.pid_turn_set(53_deg, TURN_SPEED); //turn to mogo
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-36_in, 85, true); //drive to mogo
+chassis.pid_wait_until(-32); //this line makes the bot clamp once it gets to the mogo, and then keep going to the desired target
+mogoMech.set(true);
+chassis.pid_wait_quick_chain();
+chassis.pid_turn_relative_set(127_deg, TURN_SPEED); //turn to safe ring stack
+chassis.pid_wait_quick_chain();
+intake.move(127); //run intake to pick up rings for the rest of auton
+chassis.pid_drive_set(18_in, 85, true); //drive to safe ring stack
+chassis.pid_wait_quick_chain();
+chassis.pid_turn_relative_set(-66_deg, TURN_SPEED); //turn to corner
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(25_in, 85, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(18.5_in, 65, true); //the rest of the code just makes it ram into the corner 3 times to hopefully pick up all the rings
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-10_in, 55, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 85, true);
+//hook.move(120);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-10_in, 55, true);
+//hook.move(-25);
+chassis.pid_wait_quick_chain();
+//chassis.pid_turn_relative_set(6_deg, TURN_SPEED);
+//chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 85, true);
+//hook.move(120);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-10_in, 60, true);
+//hook.move(-25);
+chassis.pid_wait_quick_chain();
+//chassis.pid_turn_relative_set(-6_deg, TURN_SPEED);
+//chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 60, true);
+//hook.move(120);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-10_in, 60, true);
+//hook.move(-25);
+chassis.pid_wait_quick_chain();
+//chassis.pid_turn_relative_set(6_deg, TURN_SPEED);
+//chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(11_in, 60, true);
+//hook.move(120);
+chassis.pid_turn_relative_set(20_deg, TURN_SPEED);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-52_in, 100, true);
 }
 
 
-void newauton(){
+void BLUE_rightAWP(){
+    is_red = true; //is_red means it will sort OUT red, not that you are on red team
+  is_color_sorting = true;
+  pros::delay(500);
+intake.move(-80); //intake moves backwards to push rings out of the way better
+chassis.pid_drive_set(10_in, 55, true); //
+chassis.pid_wait_quick_chain();
+chassis.pid_turn_set(-90_deg, 50); //turn towards alliance stake
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(7_in, 45, true); //drive to alliance stake
+intake.move(0); 
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-2_in, 55, true); //drive away from alliance stake
+chassis.pid_wait_quick_chain();
+chassis.pid_turn_set(-53_deg, TURN_SPEED); //turn to mogo
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-36_in, 85, true); //drive to mogo
+chassis.pid_wait_until(-33.5 ); //this line makes the bot clamp once it gets to the mogo, and then keep going to the desired target
+mogoMech.set(true);
+chassis.pid_wait_quick_chain();
+chassis.pid_turn_relative_set(-127_deg, TURN_SPEED); //turn to safe ring stack
+chassis.pid_wait_quick_chain();
+intake.move(127); //run intake to pick up rings for the rest of auton
+chassis.pid_drive_set(18_in, 85, true); //drive to safe ring stack
+chassis.pid_wait_quick_chain();
+chassis.pid_turn_relative_set(66_deg, TURN_SPEED); //turn to corner
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(25_in, 85, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(1_in, 65, true); //the rest of the code just makes it ram into the corner 3 times to hopefully pick up all the rings
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-10_in, 55, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 85, true);
+//hook.move(120);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-10_in, 55, true);
+//hook.move(-25);
+chassis.pid_wait_quick_chain();
+//chassis.pid_turn_relative_set(6_deg, TURN_SPEED);
+//chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 85, true);
+//hook.move(120);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-10_in, 60, true);
+//hook.move(-25);
+chassis.pid_wait_quick_chain();
+//chassis.pid_turn_relative_set(-6_deg, TURN_SPEED);
+//chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 60, true);
+//hook.move(120);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-10_in, 60, true);
+//hook.move(-25);
+chassis.pid_wait_quick_chain();
+//chassis.pid_turn_relative_set(6_deg, TURN_SPEED);
+//chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(11_in, 60, true);
+//hook.move(120);
+chassis.pid_turn_relative_set(-20_deg, TURN_SPEED);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-52_in, 100, true);
 }
 
-void newauton2(){
+void BLUE_leftAWP(){
+    is_red = true; 
+    //is_red means it will sort OUT red, not that you are on red team
+  is_color_sorting = true;
+intake.move(-80); 
+//intake moves backwards to push rings out of the way better
+chassis.pid_drive_set(8_in, 55, true); 
+// fuck you oz ily you're doing great
+chassis.pid_wait_quick_chain();
+chassis.pid_turn_set(90_deg, 50); 
+//turn towards alliance stake
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(7_in, 45, true); 
+//drive to alliance stake
+intake.move(0); 
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-3_in, 55, true); 
+//drive away from alliance stake
+chassis.pid_wait_quick_chain();
+chassis.pid_turn_set(53_deg, TURN_SPEED); 
+//turn to mogo
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-36_in, 85, true); 
+//drive to mogo
+chassis.pid_wait_until(-32); 
+//this line makes the bot clamp once it gets to the mogo, and then keep going to the desired target
+mogoMech.set(true);
+chassis.pid_wait_quick_chain();
+chassis.pid_turn_relative_set(127_deg, TURN_SPEED); 
+//turn to safe ring stack
+chassis.pid_wait_quick_chain();
+intake.move(127); 
+//run intake to pick up rings for the rest of auton
+chassis.pid_drive_set(18_in, 85, true); 
+//drive to safe ring stack
+chassis.pid_wait_quick_chain();
+chassis.pid_turn_relative_set(-66_deg, TURN_SPEED); 
+//turn to corner
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(25_in, 85, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(17_in, 65, true); 
+//the rest of the code just makes it ram into the corner 3 times to hopefully pick up all the rings
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-10_in, 55, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 85, true);
+//hook.move(120);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-10_in, 55, true);
+//hook.move(-25);
+chassis.pid_wait_quick_chain();
+//chassis.pid_turn_relative_set(6_deg, TURN_SPEED);
+//chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 85, true);
+//hook.move(120);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-10_in, 60, true);
+//hook.move(-25);
+chassis.pid_wait_quick_chain();
+//chassis.pid_turn_relative_set(-6_deg, TURN_SPEED);
+//chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 60, true);
+//hook.move(120);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-10_in, 60, true);
+//hook.move(-25);
+chassis.pid_wait_quick_chain();
+//chassis.pid_turn_relative_set(6_deg, TURN_SPEED);
+//chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(11_in, 60, true);
+//hook.move(120);
+chassis.pid_turn_relative_set(20_deg, TURN_SPEED);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-52_in, 100, true);
 }
   void rightside(){
+    is_color_sorting=true;
+    is_red=true;
 mogoMech.set(false);
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(-24_in, 50, true);
+chassis.pid_drive_set(-26_in, 60, true);
 chassis.pid_wait_quick_chain();
-mogoMech.set(true);
-chassis.pid_wait_quick_chain();
-chassis.pid_turn_set(-90_deg, TURN_SPEED);
-chassis.pid_wait_quick_chain();
+mogoMech.set(true);//clamp mogo
+chassis.pid_wait_quick_chain();   
+chassis.pid_turn_set(-135_deg, TURN_SPEED);//turn to ring
 intake.move(127);
+chassis.pid_wait_quick_chain();  
+chassis.pid_drive_set(21_in, 70, true);
+chassis.pid_wait_quick_chain();  
+chassis.pid_turn_set(-90_deg, TURN_SPEED); 
+mouth.move(127);
+hook.move(100);
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(14_in, 70, true);
+chassis.pid_drive_set(17_in, 80, true);
 chassis.pid_wait_quick_chain();
-chassis.pid_turn_set(90_deg, TURN_SPEED);
+chassis.pid_drive_set(-8_in, 80, true);
+chassis.pid_wait_quick_chain();  
+chassis.pid_turn_set(-0_deg, TURN_SPEED); 
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(30_in, 70, true);
+chassis.pid_drive_set(35_in, 80, true);
 chassis.pid_wait_quick_chain();
-chassis.pid_turn_set(121_deg, TURN_SPEED);
+chassis.pid_turn_set(-45_deg, TURN_SPEED); 
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(16_in, 70, true);
+chassis.pid_drive_set(26_in, 80, true);
 chassis.pid_wait_quick_chain();
-intake.move(0);
+chassis.pid_drive_set(-12_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-12_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-12_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-12_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-20_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_turn_set(90_deg, TURN_SPEED); 
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(120_in, 80, true);
+chassis.pid_wait_quick_chain();
 }
-//chassis.pid_wait_quick_chain();
-//chassis.pid_turn_set(121_deg, TURN_SPEED);
-//chassis.pid_wait_quick_chain();
-//chassis.pid_drive_set(16_in, 70, true);
-//chassis.pid_wait_quick_chain();
-
-  void leftside(){
+void leftside(){
+    is_color_sorting=true;
+    is_red=false;
 mogoMech.set(false);
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(-24_in, 90, true);
+chassis.pid_drive_set(-26_in, 60, true);
+chassis.pid_wait_quick_chain();
+mogoMech.set(true);//clamp mogo
+chassis.pid_wait_quick_chain();   
+chassis.pid_turn_set(135_deg, TURN_SPEED);//turn to ring
+intake.move(127);
+chassis.pid_wait_quick_chain();  
+chassis.pid_drive_set(20_in, 70, true);
+chassis.pid_wait_quick_chain();  
+chassis.pid_turn_set(90_deg, TURN_SPEED); 
+mouth.move(127);
+hook.move(100);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(17_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-8_in, 80, true);
+chassis.pid_wait_quick_chain();  
+chassis.pid_turn_set(0_deg, TURN_SPEED); 
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(35_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_turn_set(45_deg, TURN_SPEED); 
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(26_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-12_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-12_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-12_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-12_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(14_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-20_in, 80, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_turn_set(-90_deg, TURN_SPEED); 
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(120_in, 80, true);
+chassis.pid_wait_quick_chain();
+}
+
+
+
+
+
+
+
+ /* void leftside(){
+    is_color_sorting=true;
+    is_red=false;
+mogoMech.set(false);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(-26_in, 60, true);
 chassis.pid_wait_quick_chain();
 mogoMech.set(true);//clamp mogo
 chassis.pid_wait_quick_chain();   
@@ -309,16 +599,32 @@ chassis.pid_turn_set(90_deg, TURN_SPEED);//turn to ring
 chassis.pid_wait_quick_chain();
 intake.move(127);
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set(31.5_in, 140, true); //drive to ring
+chassis.pid_drive_set(27_in, 70, true); //drive to ring
 chassis.pid_wait_quick_chain();
 chassis.pid_turn_set(180_deg, TURN_SPEED);
 chassis.pid_wait_quick_chain();
 chassis.pid_drive_set(15_in, 30, true);
 chassis.pid_wait_quick_chain();
 chassis.pid_turn_set(270_deg, TURN_SPEED, ez::cw);
-chassis.pid_drive_set(24_in, 30, true);
 chassis.pid_wait_quick_chain();
-intake.move(0);}
+chassis.pid_drive_set(15_in, 30, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_turn_set(-135_deg, TURN_SPEED, ez::cw);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(135_in, 100, true);
+chassis.pid_wait_quick_chain();
+chassis.pid_drive_set(30_in, 70, true);
+chassis.pid_wait_quick_chain();
+}*/
+void ringrushBLUE(){
+
+}
+void ringrushRED(){
+
+}
+void newauton(){
+  
+}
 
 void skills(){
 mogoMech.set(false);
@@ -326,7 +632,7 @@ intake.move(127);
 chassis.pid_wait_quick_chain();
 chassis.pid_drive_set (-5_in, 90, true);
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set (10_in, 90, true);
+chassis.pid_drive_set (7_in, 90, true);
 chassis.pid_wait_quick_chain();
 intake.move(0);
 chassis.pid_wait_quick_chain();
@@ -343,17 +649,21 @@ chassis.pid_drive_set (22_in, 40, true);
 chassis.pid_wait_quick_chain();
 chassis.pid_turn_set(90_deg, TURN_SPEED);
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set (20_in, 40, true); // grab first set of rings
+chassis.pid_drive_set (20_in, 40, true); 
+// grab first set of rings
 chassis.pid_wait_quick_chain();
 chassis.pid_turn_set(180_deg, TURN_SPEED);
+intake.move(-10);
 chassis.pid_wait_quick_chain();
 chassis.pid_drive_set (42_in, 40, true);
 chassis.pid_wait_quick_chain();
 chassis.pid_drive_set (-12_in, 40, true);
 chassis.pid_wait_quick_chain();
 chassis.pid_turn_set(90_deg, TURN_SPEED);
+intake.move(127);
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set (13_in, 40, true); //grabs 2nd ring
+chassis.pid_drive_set (13_in, 40, true); 
+//grabs 2nd ring
 chassis.pid_wait_quick_chain();
 chassis.pid_drive_set (-4_in, 40, true);
 chassis.pid_wait_quick_chain();
@@ -362,16 +672,20 @@ chassis.pid_wait_quick_chain();
 chassis.pid_drive_set (-28_in, 40, true);
 chassis.pid_wait_quick_chain();
 mogoMech.set(false);
-intake.move(0);
+intake.move(-5);
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set (12_in, 40, true); //put mogo in corner
+chassis.pid_drive_set (12_in, 40, true); 
+//put mogo in corner
 chassis.pid_wait_quick_chain();
 chassis.pid_turn_set(90_deg, TURN_SPEED);
 chassis.pid_wait_quick_chain();
-chassis.pid_drive_set (-72_in, 40, true); //put mogo in corner
+chassis.pid_drive_set (-72_in, 40, true); 
+//put mogo in corner
 chassis.pid_wait_quick_chain();
 mogoMech.set(true);
-chassis.pid_turn_set(-90_deg, TURN_SPEED); //Hopes and fucking dreams
+chassis.pid_turn_set(-90_deg, TURN_SPEED);
+intake.move(127); 
+//Hopes and fucking dreams
 chassis.pid_wait_quick_chain();
 chassis.pid_drive_set(48_in, 40, true);
 chassis.pid_wait_quick_chain();
@@ -400,7 +714,7 @@ void testautonRed() {
   is_red = true;
   is_color_sorting = true;
   
-	mogoMech.set(true);
-	intake.move(119);
+	//mogoMech.set(true);
+	intake.move(100);
 	chassis.pid_wait();
 }

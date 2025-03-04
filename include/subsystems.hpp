@@ -1,5 +1,6 @@
 #pragma once
 
+#include "EZ-Template/PID.hpp"
 #include "EZ-Template/piston.hpp"
 #include "api.h"
 #include "pros/motor_group.hpp"
@@ -11,7 +12,8 @@ inline pros::MotorGroup intake({1, -8});
 inline pros::Motor hook(-8);
 inline pros::Motor mouth (1);
 inline pros::Motor ladybrown (4);
-
+inline ez::PID lbPID{.2, .0, .0, 0, "ladybrown"};
+inline pros::Rotation lbsens(2);
 
 //only keeping this bit in because some of the code relies on it as a variable, just change it to an unused port or get an optical sensor
 inline pros::Optical ringsens(6);
@@ -19,4 +21,5 @@ inline pros::Optical ringsens(6);
 // inline pros::adi::DigitalIn limit_switch('A');
 inline ez::Piston mogoMech('A');
 inline ez::Piston doinker ('B');
+void ladybrownTask();
 

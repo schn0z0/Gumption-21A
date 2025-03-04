@@ -15,7 +15,7 @@ ez::Drive chassis(
     {-18,15,-19},     // Left Chassis Ports (negative port will reverse it!
     {-17,12,16},  // Right Chassis Ports (negative port will reverse it!)
 
-    10,      // IMU Port
+    21,      // IMU Port
     3.25,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
     360);   // Wheel RPMz
 
@@ -62,14 +62,15 @@ void initialize() {
   // Autonomous Selector using lvgl
   j_auton_selector.jautonpopulate(
     
-		{    jas::jasauton(rightAWP, 2, 2, "Right side AWP", "RIGHT SIDE AWP", 0, 3, true),
-		jas::jasauton(leftAWP, 2, 2, "left side AWP", "LEFT SIDE AWP", 3, 0, true),
-    jas::jasauton(leftside, 2, 2, "Left side auton", "LEFT LEFT LEFT LEFT LEFT LEFT LEFT", 2, 0, false),
-		jas::jasauton(rightside, 2, 2, "Right side auton", "RIGHT RIGHT RIGHT RIGHT RIGHT RIGHT RIGHT", 0, 2, false),
+		{        jas::jasauton(leftside, 2, 2, "Left side auton", "LEFT LEFT LEFT LEFT LEFT LEFT LEFT", 2, 0, false),
+		jas::jasauton(rightside, 2, 2, "Right side auton", "RIGHT RIGHT RIGHT RIGHT RIGHT RIGHT RIGHT", 0, 2, false),jas::jasauton(RED_rightAWP, 2, 2, "RED RIGHT AWP", "RED RIGHT AWP RED RIGHT AWP RED RIGHT AWP", 0, 3, true),
+		jas::jasauton(RED_leftAWP, 2, 2, "RED LEFT AWP", "RED LEFT AWP RED LEFT AWP RED LEFT AWP", 3, 0, true),
+    jas::jasauton(BLUE_rightAWP, 0, 0, "BLUE RIGHT AWP", "BLUE RIGHT AWP BLUE RIGHT AWP BLUE RIGHT AWP", 0, 0, false),
+    jas::jasauton(BLUE_leftAWP, 0, 0, "BLUE LEFT AWP", "BLUE LEFT AWP BLUE LEFT AWP BLUE LEFT AWP", 0, 0, false),
+		jas::jasauton(newauton, 2, 2, "n", "SKILLS SKILLS SKILLS SKILLS SKILLS", 5, 5, false),
+    jas::jasauton(ringrushRED, 2, 2, "Red Ring Rush", "RED RING RUSH RED", 2, 0, false),
+		jas::jasauton(ringrushBLUE, 2, 2, "Blue Ring Rush", "BLUE RING RUSH BLUE ", 0, 2, false),
 		jas::jasauton(skills, 2, 2, "skills", "SKILLS SKILLS SKILLS SKILLS SKILLS", 5, 5, false),
-    jas::jasauton(newauton, 1, 1, "Blank auton 1", "color sort test red", 0, 0, false),
-		jas::jasauton(newauton2, 0, 0, "Blank auton 2", "color sort test blue", 0, 0, false),
-
     jas::jasauton(testautonRed, 0, 0, "Red Color sort test", "color sort test blue", 0, 0, false)
     
     
@@ -87,6 +88,8 @@ void initialize() {
 	pros::Task tempcheckcontroller(tempcheckctrl);
 	pros::Task colordetection(colorDetect);
   pros::Task ringsensetask(ringsensTask);
+  pros::Task ladybrownpid(ladybrownTask);
+  pros::Task unjam(unjamTask);
 }
 
 /**
@@ -129,15 +132,9 @@ void autonomous() {
   chassis.odom_xyt_set(0_in, 0_in, 0_deg);	// Set the current position, you can start at a specific position with this
   chassis.drive_brake_set(MOTOR_BRAKE_HOLD);  // Set motors to hold.  This helps autonomous consistency
   
-  if(lv_tileview_get_tile_act(mainscreen) == autobuilder)
-		autocallback();
-  else if(lv_tileview_get_tile_act(mainscreen) == manbuilder)
-		mancallback();
-  else {
 		if(noselection == false) {
 			printf("Running auton");
 			jautonrun();
-		}
 	}
 }
 
@@ -156,7 +153,7 @@ void autonomous() {
  */
 bool setLB = true;
 bool was_preset_pressed = false;
-double target = 0.0;
+//double target = 0.0;
 
 
 void opcontrol() {
@@ -202,29 +199,20 @@ void opcontrol() {
 
 
 
-	if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
+	if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
 		was_preset_pressed = true;
 		setLB = !setLB;
-		if(ladybrown.get_position() > 280) setLB = false;
+		if(ladybrown.get_position() > 380) setLB = false;
 		if(setLB) {
-			ladybrown.move_absolute(10, 100);
+			lbPID.target_set(10);
 		} else {
-			ladybrown.move_absolute(190, 100);
+			lbPID.target_set(255);
 		}
 	} else {
 		if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
-			ladybrown.move(90);
-			target = ladybrown.get_position();
-			was_preset_pressed = false;
+      lbPID.target_set(ladybrown.get_position() + 250);
 		} else if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
-			ladybrown.move(-90);
-			target = ladybrown.get_position();
-			was_preset_pressed = false;
-		} else {
-			if(!was_preset_pressed) {
-				ladybrown.move_absolute(target, 20);  // this isn't going full power because it was yucky going full power
-			}
-		}
+      lbPID.target_set(ladybrown.get_position() - 250);
 	}
 
 
@@ -238,12 +226,8 @@ void opcontrol() {
     intake.move(0);
 }
   mogoMech.button_toggle(master.get_digital(pros::E_CONTROLLER_DIGITAL_Y));
-  doinker.button_toggle(master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT));
+  doinker.set(master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN));
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }
- 
-  
-
-
-
+}
 }
